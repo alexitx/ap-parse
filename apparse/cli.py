@@ -8,6 +8,21 @@ from . import parse_iw_device, parse_iw_station, parse_iwinfo_device, parse_iwin
 
 def cli():
 
+    def format_exc(exc, tb=False):
+        if str(exc):
+            msg = f'{type(exc).__name__}: {exc}'
+            if tb:
+                return f'{msg}\n{traceback.format_exc()}'
+            return msg
+        return f'{type(exc).__name__}: {traceback.format_exc()}'
+
+    def error(msg, exc=None, tb=False):
+        if exc:
+            print(f'{msg}: {format_exc(exc, tb)}', file=sys.stderr)
+        else:
+            print(msg, file=sys.stderr)
+        sys.exit(1)
+
     class HelpFormatter(argparse.HelpFormatter):
 
         def __init__(self, *args, **kwargs):
@@ -55,11 +70,7 @@ def cli():
     try:
         print(parse_func(sys.stdin.read()))
     except ValueError as e:
-        if str(e):
-            print(f'Error: {type(e).__name__}: {e}', file=sys.stderr)
-        else:
-            print(f'Error: {type(e).__name__}\n{traceback.format_exc()}', file=sys.stderr)
-        sys.exit(1)
+        error('Error parsing data', e)
 
 
 def main():
