@@ -4,6 +4,7 @@ from .base_parser import BaseParser
 
 
 class IwDeviceParser(BaseParser):
+    """Parser for a device list of the iw utility"""
 
     _channel_regex = re.compile(r'^(?P<channel>\d+) \((?P<frequency>\d+) MHz\)')
     _tx_power_regex = re.compile(r'^(?P<tx_power>\d+\.\d+) dBm$')
@@ -41,17 +42,20 @@ class IwDeviceParser(BaseParser):
                 continue
 
             if self._current is None:
+                # Got a cell before the header of the table
                 raise ValueError('Missing header')
             if key not in self._parser_keys:
                 continue
 
             pattern = self._parser_keys[key]
+            # If the pattern is a regex try to match it, otherwise use the raw value later
             if pattern is not None:
                 match = pattern.match(value)
                 if not match:
                     raise ValueError(f"Invalid value for key '{key}'")
                 groups = match.groupdict()
 
+            # Populate the data dict with available values
             if key == 'addr':
                 self._data[self._current]['mac_address'] = value
             elif key == 'ssid':

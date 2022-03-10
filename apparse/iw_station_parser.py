@@ -4,6 +4,7 @@ from .base_parser import BaseParser
 
 
 class IwStationParser(BaseParser):
+    """Parser for a station list of the iw utility"""
 
     _header_regex = re.compile(r'^Station (?P<mac_address>.+) \(on (?P<device>.+)\)$')
     _inactive_time_regex = re.compile(r'^(?P<inactive_time>\d+) ms$')
@@ -84,7 +85,10 @@ class IwStationParser(BaseParser):
                 continue
 
             if line[0] in {' ', '\t'}:
+                # Line is a table body
+
                 if self._current is None:
+                    # Got a cell before the header of the table
                     raise ValueError('Missing header')
                 if ':' not in line:
                     continue
@@ -95,12 +99,14 @@ class IwStationParser(BaseParser):
                 value = value.lstrip()
 
                 pattern = self._parser_keys[key]
+                # If the pattern is a regex try to match it, otherwise use the raw value later
                 if pattern is not None:
                     match = pattern.match(value)
                     if not match:
                         raise ValueError(f"Invalid value for key '{key}'")
                     groups = match.groupdict()
 
+                # Populate the data dict with available values
                 if key == 'inactive time':
                     self._data[self._current]['inactive_time'] = int(groups['inactive_time'])
                 elif key == 'rx bytes':
@@ -157,6 +163,8 @@ class IwStationParser(BaseParser):
                     self._data[self._current]['connected_time'] = int(groups['connected_time'])
 
                 continue
+
+            # Line is a table header
 
             match = self._header_regex.match(line)
             if not match:

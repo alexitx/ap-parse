@@ -4,6 +4,7 @@ from .base_parser import BaseParser
 
 
 class IwinfoDeviceParser(BaseParser):
+    """Parser for a device list of the iwinfo utility"""
 
     _header_regex = re.compile(r'^(?P<device_name>[^ ]+) +ESSID: \"(?P<ssid>.+)\"$')
     _mode_regex = re.compile(
@@ -64,7 +65,10 @@ class IwinfoDeviceParser(BaseParser):
                 continue
 
             if line[0] in {' ', '\t'}:
+                # Line is a table body
+
                 if self._current is None:
+                    # Got a cell before the header of the table
                     raise ValueError('Missing header')
                 if ':' not in line:
                     continue
@@ -75,12 +79,14 @@ class IwinfoDeviceParser(BaseParser):
                 value = value.lstrip()
 
                 pattern = self._parser_keys[key]
+                # If the pattern is a regex try to match it, otherwise use the raw value later
                 if pattern is not None:
                     match = pattern.match(value)
                     if not match:
                         raise ValueError(f"Invalid value for key '{key}'")
                     groups = match.groupdict()
 
+                # Populate the data dict with available values
                 if key == 'Access Point':
                     self._data[self._current]['mac_address'] = value
                 elif key == 'Mode':
@@ -152,6 +158,8 @@ class IwinfoDeviceParser(BaseParser):
                     self._data[self._current]['phy_name'] = groups['phy_name']
 
                 continue
+
+            # Line is a table header
 
             match = self._header_regex.match(line)
             if not match:

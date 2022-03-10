@@ -4,6 +4,7 @@ from .base_parser import BaseParser
 
 
 class IwinfoStationParser(BaseParser):
+    """Parser for a station list of the iwinfo utility"""
 
     _header_regex = re.compile(
         r'^(?P<mac_address>.+)  (?P<signal>\-?\d+) dBm / (?P<noise>\-?\d+) dBm '
@@ -43,6 +44,8 @@ class IwinfoStationParser(BaseParser):
                 continue
 
             if line[0] in {' ', '\t'}:
+                # Line is a table body
+
                 if self._current is None:
                     raise ValueError('Missing header')
                 if ':' not in line:
@@ -84,6 +87,8 @@ class IwinfoStationParser(BaseParser):
                     self._data[self._current]['throughput'] = throughput
 
                 continue
+
+            # Line is a table header
 
             match = self._header_regex.match(line)
             if not match:
