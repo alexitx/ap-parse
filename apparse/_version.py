@@ -1,0 +1,6 @@
+__author__ = 'alexitx'
+__author_email__ = 'alexander@alexitx.com'
+__license__ = 'MIT'
+__title__ = 'ap-parse'
+__url__ = 'https://github.com/alexitx/ap-parse'
+__version__ = '0.1.0'
