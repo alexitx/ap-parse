@@ -66,7 +66,8 @@ class IwDeviceParser(BaseParser):
             elif key == 'channel':
                 self._data[self._current]['channel'] = int(groups['channel'])
                 self._data[self._current]['frequency'] = int(groups['frequency'])
-                self._data[self._current]['width'] = int(groups['width'])
+                if groups['width'] is not None:
+                    self._data[self._current]['width'] = int(groups['width'])
             elif key == 'txpower':
                 self._data[self._current]['tx_power'] = float(groups['tx_power'])
 
