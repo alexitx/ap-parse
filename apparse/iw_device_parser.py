@@ -6,7 +6,7 @@ from .base_parser import BaseParser
 class IwDeviceParser(BaseParser):
     """Parser for a device list of the iw utility"""
 
-    _channel_regex = re.compile(r'^(?P<channel>\d+) \((?P<frequency>\d+) MHz\), width: (?P<width>\d+)')
+    _channel_regex = re.compile(r'^(?P<channel>\d+) \((?P<frequency>\d+) MHz\)(?:, width: (?P<width>\d+) MHz)')
     _tx_power_regex = re.compile(r'^(?P<tx_power>\d+\.\d+) dBm$')
 
     _default_keys = (
